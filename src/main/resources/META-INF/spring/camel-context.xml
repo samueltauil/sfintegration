@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configures the Camel Context-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+
+    <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:salesforce.properties</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="salesforce" class="org.apache.camel.component.salesforce.SalesforceComponent">
+        <property name="packages" value="com.redhat.gpe.salesforce.dto" />
+        <property name="loginConfig">
+            <bean class="org.apache.camel.component.salesforce.SalesforceLoginConfig">
+                <property name="loginUrl" value="https://login.salesforce.com"></property>
+                <property name="clientId" value="${salesforce.clientid}"/>
+                <property name="clientSecret" value="${salesforce.clientsecret}"/>
+                <property name="userName" value="${salesforce.username}"/>
+                <property name="password" value="${salesforce.password}"/>
+            </bean>
+        </property>
+    </bean>
+
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+
+
+      <route id="salesforceOpportunities">
+
+          <from uri="timer://runOnce?repeatCount=1&amp;delay=10"/>
+          <to uri="salesforce:query?sObjectQuery=SELECT id,name from Opportunity&amp;sObjectClass=com.redhat.gpe.salesforce.dto.QueryRecordsOpportunity" />
+          <to uri="log: Query result back from Salesforce:${body}" />
+
+      </route>
+
+  </camelContext>
+
+</beans>

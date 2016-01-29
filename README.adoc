@@ -1,0 +1,18 @@
+Salesforce Camel Integration
+===========================
+
+First populate the salesforce.properties with your own access data.
+
+To build this project use
+
+    mvn install
+
+To run this project with Maven use
+
+    mvn camel-salesforce:generate
+    mvn camel:run
+
+For more help see the Apache Camel documentation
+
+    http://camel.apache.org/
+
